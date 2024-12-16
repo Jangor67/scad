@@ -1,9 +1,8 @@
 // Model to help drilling and cutting an existing pistol grip
 
-out_d  = 50.5+0.3; out_r = out_d/2;
-sml_d  = 3.2;
-sml_l  = 5;
-sml_lo = 360 * sml_l / 2 / (PI * out_d);
+out_d  = 50.5+0.3; out_r = out_d/2; // should fit around grip
+sml_d  = 3.2;                       // size of the holes
+sml_l  = 5;                         // distance between holes
 
 // Some material definitions
 // defaults in prusa slicer 0.15 height (0.2 first layer)
@@ -14,6 +13,12 @@ p=0.8; 2p=p*2; 4p=2*2p;
 
 $fn=20;
 
+// Some calculations
+// calculate the half of the length offset in degrees
+sml_lo = (360 / PI / out_d) * (sml_l / 2); 
+
+// can be used to "drill" a single hole in the tube 
+// at a particlar angle and height
 module drill_single(
     d = 0,
     h = base_h
@@ -26,7 +31,11 @@ module drill_single(
         cylinder(h=3*4p,d=sml_d);
 }
 
-module drill(
+// can be used to "drill" two hole in the tube 
+// at a particlar angle and height, it can
+// also be used to clear the material between the
+// holes
+module drill_double(
     d = 0,        // degrees
     h = base_h, // height
     isHull = false
@@ -42,18 +51,24 @@ module drill(
     }
 }
 
+
+
 difference() {
-    cylinder(h=base_h+16,d=out_d+4p,$fn=60);
+    // base cylinder
+    cylinder(h=base_h+16,d=out_d+4p,$fn=120);
+    // make a tube next
     translate([0,0,base_h])
-        cylinder(h=base_h+16,d=out_d,$fn=60);
+        cylinder(h=base_h+16,d=out_d,$fn=120);
+    // remove extra surplus material
     translate([0,0,-0.01])
-        cylinder(h=base_h+16,d=out_d-4p,$fn=60);
+        cylinder(h=base_h+16,d=out_d-4p,$fn=120);
     
-    drill(  0, base_h+8, isHull=true);
-    *drill(60, base_h+8);
-    drill( 90, base_h+8, isHull=true);
-    drill(180, base_h+8);
-    drill(270, base_h+8);
+    // now we start the "drilling"
+    drill_double(  0, base_h+8, isHull=true);
+    *drill_double(60, base_h+8);
+    drill_double( 90, base_h+8, isHull=true);
+    drill_double(180, base_h+8);
+    drill_double(270, base_h+8);
     
     drill_single(45+000,base_h);
     drill_single(45+090,base_h);
