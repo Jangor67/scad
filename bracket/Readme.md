@@ -4,9 +4,9 @@ This folder contains a small collection of brackets
 
 The raspberry pi needed a wall mount
 
-- [pi_wall_mount](pi_wall_mount.png) 
-- [pi_wall_mount_1](pi_wall_mount_1.jpg) 
-- [pi_wall_mount_2](pi_wall_mount_2.jpg) 
+- ![pi_wall_mount](pi_wall_mount.png) 
+- ![pi_wall_mount_1](pi_wall_mount_1.jpg) 
+- ![pi_wall_mount_2](pi_wall_mount_2.jpg) 
 
 !NVR
 
