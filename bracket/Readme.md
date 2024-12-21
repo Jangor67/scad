@@ -1,8 +1,20 @@
-My NVR needed some work. It was noisy so the
+This folder contains a small collection of brackets
 
-- HDD needed to be replaced with an SSD (see the xdd folder)
-- The fan needed to be replaced with a silent fan and a fan controler
-  - this fan controler needed a bracket to hold it in place
+!Pi
+
+The raspberry pi needed a wall mount
+
+- [pi_wall_mount](pi_wall_mount.png) 
+- [pi_wall_mount_1](pi_wall_mount_1.jpg) 
+- [pi_wall_mount_2](pi_wall_mount_2.jpg) 
+
+!NVR
+
+My NVR also needed some work. It was noisy so the
+
+- HDD needed to be replaced with an SSD (see the [xdd folder](../xdd/Readme.md))
+- The fan needed to be replaced with a silent fan and fan controler
+  - the fan controler needed a [bracket](fan_control_bracket_nvr.scad) to hold it in place
   - glue worked fine but this bracket works even better!
 
 There is also a design for a base bracked to mount the NVR against the wall
