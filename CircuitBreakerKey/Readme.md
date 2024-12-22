@@ -3,8 +3,10 @@ This folder contains the open scad design of a ciruit breaker key
 It is not perfect since Rendering will take ages but finally
 it did render and i got it printed as well (using PETG)
 
+*Following helped a lot getting some measurements from the first photograph
+[eleif.net/photomeasure](https://eleif.net/photomeasure)*
 
-Some notes and images/photos
+Some notes and images/photos about the design
 
 - 14-10-2024 started working on the circuit breaker key based on a first 
   ![photo_1](CircuitBreakerKeyOriginal_1.jpeg)
@@ -23,7 +25,4 @@ Some notes and images/photos
   - rendering duurde lang
   - suspect are the sharp corners on the edge of the handle
   - matching the design using
-  - ![image]()
-- Following helped a lot getting some measurements from the first photograph
-  - https://eleif.net/photomeasure
 
