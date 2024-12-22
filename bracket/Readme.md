@@ -24,3 +24,12 @@ My NVR also needed some work. It was noisy as hell so the
 
 There is also a design for a base bracked to mount the NVR against the wall
 this never got printed and I mounted it using 4 washers directly to the wall...
+
+# Letterbox
+
+We wanted to mount an old letterbox shield on our former front door.
+
+- ![design 1](letterbox_bracket_1.png)
+- ![design 2](letterbox_bracket_2.png)
+- ![result 1](letterbox_bracket_1.jpg)
+- ![result 2](letterbox_bracket_2.jpg)
