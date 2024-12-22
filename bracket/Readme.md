@@ -20,7 +20,7 @@ My NVR also needed some work. It was noisy as hell so the
   - the fan controler needed a [bracket](fan_control_bracket_nvr.scad) to hold it in place
   - glue worked fine but this bracket works even better!
 
-![End result](NVR_result_photo.jpg)
+![End result](../xdd/NVR_result_photo.jpg)
 
 There is also a design for a base bracked to mount the NVR against the wall
 this never got printed and I mounted it using 4 washers directly to the wall...
