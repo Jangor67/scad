@@ -2,12 +2,7 @@ This folder contains a small collection of brackets
 
 # Raspberry Pi
 
-The good old raspberry pi needed a wall mount. Exact model: Raspberry Pi2 model B Plus Rev 1.2
-
-- ![pi_wall_mount](pi_wall_mount.png) 
-- ![pi_wall_mount_1](pi_wall_mount_1.jpg) 
-- ![pi_wall_mount_2](pi_wall_mount_2.jpg) 
-- also a [dust cap](../pi/Readme.md) was created
+The Pi has its own folder with projects including this wall mount [bracket](../pi/pi_wall_mount.scad). See also [pi Readme](../pi/Readme.md)
 
 # Network Video Recorder (NVR)
 
