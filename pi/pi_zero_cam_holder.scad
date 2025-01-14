@@ -4,133 +4,220 @@
 
 include <MCAD/boxes.scad>
 
-box_th=15;    // starting at 13, 
-              // biggest thickness in the middle (at the cam)
+// box below refers to the housing 
+// therefore it is NOT the case we build around it
+// box thickness starts at 13 and is raised towards the middle
+// rubbers add an additional 1.6mm
+// also allow for some spacing (0.4)
+rubber_th=1.6;
+box_th_bare=14.6;
+box_th_incl_rubber=box_th_bare+rubber_th;
+box_th=box_th_incl_rubber+0.4;
 box_h=79;
 box_w=37.7;
 box_r=2;
 
-// when box is upright pwr is on the right side
-pwr_hs=12.5-0.4; // height start  
-pwr_he=24+0.4;   // height end
-pwr_cy=6.7;      // center pos
-pwr_d=6.7+0.8; // including some clearing
+// camera sticks out from the cover approx 4mm
+cam_lens_l_normal=3.6; // measured from top of the box cover
+cam_lens_l_wide=4.5;   // this one is bigger
+cam_lens_l=max(cam_lens_l_normal,cam_lens_l_wide);
 
-cam_th=4;     // camera sticks out from the cover approx 4mm
-cam_lens_d=8.5;      // cam hole diameter including spacing
+// cam hole diameter including spacing
+cam_lens_d=8.5; // the box comes with this hole  
+
+// the housing is the metal box holding the lens
 cam_hous_w=11.0;
 cam_hous_w2=cam_hous_w/2;
+cam_hous_th=0.7; // as measured from the top of the box cover
 
-
+// work with theme material thickness
 m=0.4*4; m2=m*2;
 
-$fn=30;
+$fn=50;
+
+debug=0;
   
+//create half_rm for the camera module to fit inside of the box
+lens_rm=4.8; half_rm=lens_rm/2;
+
+module draw_cam_module() {
+    union() {
+        // lens
+        color("black",1.0) cylinder(d=8, h=cam_lens_l);
+        translate([-cam_hous_w/2,-cam_hous_w/2])
+        color("#c0c0c0",1.0) cube([cam_hous_w,cam_hous_w,cam_hous_th]);
+    }
+}
+module draw_pi_housing() {
+    hull() {
+        translate([
+                -box_w/2,
+                -box_th_incl_rubber/2,
+                -box_h/2])
+            cube([box_w/2,13+rubber_th,box_h]);
+        translate([
+                -box_w/2,
+                -box_th/2,
+                -cam_hous_w/2])
+            cube([box_w/2,box_th_incl_rubber,cam_hous_w]);
+    }
+}
+
+if (debug) {
+    color("red", 0.5) draw_pi_housing();
+
+    // check to see if camera looks ok
+    translate([
+            0,
+            -box_th/2 +           // from backside
+            box_th_incl_rubber,   // on rubbers
+            0]) 
+        rotate([-90,0,0])
+        draw_cam_module();
+}
+
 // the basic box
 difference() {
-    union() {
-      roundedBox(
-        size=[box_w+m2, box_th+m2, box_h],
-        radius=box_r,
-        sidesonly=false);
-      translate([
-            -(cam_hous_w+2+m2)/2,
-            box_th/2+m-0.01,
-            cam_hous_w/2])
-        cube([cam_hous_w+2+m2,m,box_h/2-box_r-m2]);
-    }
+    translate([0,half_rm,0])
+        roundedBox(
+                size=[box_w+m2, box_th+m2+lens_rm, box_h+m2],
+                radius=box_r,
+                sidesonly=false);
     
     // make it a box instead of a block 
-    // leaving a notch since the bottom part is 2mm less thick
-    translate([0,0,m+4])
+    translate([0,half_rm,0])
         cube(
-            [box_w, box_th, box_h],
+            [box_w, box_th+lens_rm, box_h],
             center=true);
-    // cut out a bit deeper (leaving 2 notches)
-    translate([0,0,m])
-        cube(
-            [box_w, box_th-4, box_h],
-            center=true);
-    // remove back notch
-    translate([0,-1,m])
-        cube(
-            [box_w, box_th-2, box_h],
-            center=true);
-    // peek into the box 
-    *translate([4,-4,m])
-        cube(
-            [box_w, box_th-4, box_h],
-            center=true);
-            
+    
     // remove top of the box
-    translate([0,0,box_h/2-box_r+m])
-        cube([box_w+m2+0.1,box_th+m2+m2+0.1, box_r+m+2], center=true);
-        
-    // create room for the bulky camera housing
-    // we need a slot to slide it into its housing
-    hull() {
-      translate([0,box_th/2,0])
-        cube([cam_hous_w+2,m2+0.01,cam_hous_w+2],center=true);
-      translate([0,box_th/2,box_h/2])
-        cube([cam_hous_w+2,m2+0.01,cam_hous_w+2],center=true);
+    translate([
+            -box_w/2-m,
+            -box_th/2-m,
+            (box_h+m2)/2-max(box_r,m)-0.01])
+        cube([
+                box_w+m2+0.1,
+                box_th+lens_rm+m2+0.01, 
+                max(box_r,m)+0.02]);
+
+    // peek into the box 
+    if (debug) {
+        translate([-4,-4,0])
+            cube(
+                [box_w, box_th-4, box_h+m2+0.01],
+                center=true);
+        translate([box_w/2,+10,0])
+            cube(
+                [box_w, box_th-4, box_h+m2+0.01],
+                center=true);
     }
-    // carve another slot because the camera sticks out even further
+    
+    // help push the camera out of the box (hole in the bottom)
+    roundedBox([11,11,box_h+m2+0.01+box_r*2],radius=box_r,sidesonly=false);            
+        
+    // the camera needs to look outside of the box
+    hull() {
+        translate([0,box_th/2+lens_rm-0.01,0]) 
+            rotate([-90,0,0])
+            cylinder(d=cam_lens_d, h=0.01);
+        translate([0,box_th/2+lens_rm+m+0.01,0]) 
+            rotate([-90,0,0])
+            cylinder(d=cam_lens_d+3, h=20.01);
+    }
     hull() {
       translate([0,box_th/2,0])
-        cube([cam_lens_d,m*4+0.01,cam_lens_d],center=true);
+        cube([cam_lens_d,cam_lens_l+0.4,cam_lens_d],center=true);
       translate([0,box_th/2,box_h/2])
-        cube([cam_lens_d,m*4+0.01,cam_lens_d],center=true);
+        cube([cam_lens_d,cam_lens_l+0.4,cam_lens_d],center=true);
     }
     
     // create hole for power connector
+    // when box is upright pwr is on the right side
     pwr_c_wi=10.8;
     pwr_c_th=6.7;
     pwr_c_le=20;
-    pwr_c_sp=0.4; pwr_c_sp2=pwr_c_sp*2;
+    pwr_c_sp=0.8; pwr_c_sp2=pwr_c_sp*2;
     
-    translate([box_w/2-0.1,-box_th/2+3.4-pwr_c_sp,-box_h/2+12.4-pwr_c_sp])
+    translate([
+        box_w/2-0.1,
+        -box_th/2+rubber_th+3.8-2-pwr_c_sp,
+        -box_h/2+12.4-pwr_c_sp])
       cube([m+0.2,pwr_c_th+pwr_c_sp2,pwr_c_wi+pwr_c_sp2]);
 }
 
-// serving 2 purposes
-// - protect the camera which sticks out at the front and 
-// - double-sided-tape-mount-pieces
-module front_stickout(
-  closed  = 1,
-  width   = cam_hous_w
-) {
-  difference() {
-    cam_th2=cam_th*2;
-    roundedBox(
-        size=[width+m2,box_th+m2+cam_th2,cam_hous_w+m2], 
-        radius=2,
-        sidesonly=false);
-    if (closed == 0) {
-      roundedBox(
-        size=[width,box_th+m2+cam_th2,cam_hous_w], 
-        radius=2,
-        sidesonly=false);
-      translate([0,0,cam_hous_w/2])
-        cube([cam_lens_d,box_th+m2+cam_th2,cam_lens_d],center=true);
+// push back bars for the front side of the pi box
+translate([
+        -cam_hous_w/2-m-0.4,
+        box_th/2,
+        -box_h/2])
+    cube([
+            m,
+            lens_rm+0.1,
+            box_h]);
+translate([
+        cam_hous_w/2+0.4,
+        box_th/2,
+        -box_h/2])
+    cube([
+            m,
+            lens_rm+0.1,
+            box_h]);
+
+// push back bars for the front side edge of the pi box
+translate([
+        -cam_hous_w/2-m-0.4,
+        box_th/2-2,
+        -box_h/2])
+    hull() {
+        cube([
+            m,
+            2+lens_rm,
+            1]);
+        translate([0,2,24])
+            cube([
+                m,
+                lens_rm,
+                2]);
     }
-    cube([box_w,box_th+m2-0.01,box_h],center=true);
-    translate([0,-box_th,0])
-        cube([box_w,box_th+0.1,box_h],center=true);
-    translate([0,(box_th+m2+cam_th2)/2,0])
-        cube([cam_hous_w+m2+0.1, 4, cam_hous_w+m2+0.1],center=true);
-  }
+translate([
+        cam_hous_w/2+0.4,
+        box_th/2-2,
+        -box_h/2])
+    hull() {
+        cube([
+            m,
+            2+lens_rm,
+            1]);
+        translate([0,2,24])
+            cube([
+                m,
+                lens_rm,
+                2]);
+    }
+
+// sample power plug    
+if (debug) {
+    translate([
+            box_w/2,
+            -box_th/2-m+3.6+1.6,
+            -box_h/2-m+14])
+        color("white") { 
+            cube([21+m,6.5,11]);
+            translate([0,3.25,5.5])
+                rotate([0,90,0])
+                cylinder(d=6,h=30+m);
+    }
 }
-
-
-off_x=box_w/2-cam_hous_w/2-m2;
-off_y=box_h/2-cam_hous_w/2-m2-2;
-
-front_stickout(closed=0);
-translate([off_x,0,-off_y])
-    front_stickout(closed=1);
-translate([-off_x,0,-off_y])
-    front_stickout(closed=1);
-translate([off_x+cam_hous_w/4,0,off_y])
-    front_stickout(closed=1, width=cam_hous_w/2);
-translate([-off_x-cam_hous_w/4,0,off_y])
-    front_stickout(closed=1, width=cam_hous_w/2);
+    
+// beugeltje
+translate([box_w/2-box_r,box_th/2+lens_rm,-box_h/2-m]) {
+    cube([50+box_r,m,14+11+10]);
+    translate([0,-box_th]) {
+        hull() {
+            cube([10+box_r,box_th,m]);
+            translate([40+box_r,box_th-2,0])
+                cube([m,m+2,m]);
+        }
+    }
+}
+    
