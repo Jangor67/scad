@@ -36,9 +36,39 @@ m=0.4*4; m2=m*2;
 $fn=50;
 
 debug=0;
+cord=0;
   
-//create half_rm for the camera module to fit inside of the box
+//create room for the camera lens to fit inside of the box
 lens_rm=4.8; half_rm=lens_rm/2;
+
+module cord_holder() {
+    cord_d=3.5;
+    translate([
+            cord_d/2+max(m,box_r),
+            -cord_d/2,
+            cord_d/2+m])
+    difference() {
+        translate([-cord_d/2-m,-cord_d/2-m,-cord_d/2-m])
+            union() {
+                cube([cord_d+m2, cord_d+m2, cord_d+m2]);
+                cube([cord_d+m2, cord_d+m+max(m,box_r), m]);
+            }
+        rotate([0,90,0]) 
+            translate([0,0,-cord_d/2-m-0.01])
+            union() {
+                cylinder(d=cord_d,h=cord_d+m2+0.02);
+                hull() {
+                    cylinder(d=cord_d-0.4,h=cord_d+m2+0.02);
+                    translate([-3.5,0,0])
+                        cylinder(d=cord_d-0.4,h=cord_d+m2+0.02);
+                }
+            }
+    }
+}
+if (cord) {
+  translate([-box_w/2,-box_th/2-m,-box_h/2-m]) cord_holder();
+  translate([box_w/2-3.5-box_r-box_r,-box_th/2-m,-box_h/2-m]) cord_holder();
+}
 
 module draw_cam_module() {
     union() {
@@ -113,7 +143,7 @@ difference() {
     }
     
     // help push the camera out of the box (hole in the bottom)
-    roundedBox([11,11,box_h+m2+0.01+box_r*2],radius=box_r,sidesonly=false);            
+    roundedBox([16,11,box_h+m2+0.01+box_r*2],radius=box_r,sidesonly=false);            
         
     // the camera needs to look outside of the box
     hull() {
@@ -141,13 +171,31 @@ difference() {
     translate([
         box_w/2-0.1,
         -box_th/2+rubber_th+3.8-2-pwr_c_sp,
-        -box_h/2+12.4-pwr_c_sp])
+        -box_h/2+12.8-pwr_c_sp])
       cube([m+0.2,pwr_c_th+pwr_c_sp2,pwr_c_wi+pwr_c_sp2]);
 }
 
+// push back bars for the back side of the pi box
+translate([
+        -7,
+        -box_th/2,
+        -box_h/2])
+    cube([
+            m,
+            rubber_th,
+            box_h]);
+translate([
+        7-m,
+        -box_th/2,
+        -box_h/2])
+    cube([
+            m,
+            rubber_th,
+            box_h]);
+
 // push back bars for the front side of the pi box
 translate([
-        -cam_hous_w/2-m-0.4,
+        -cam_hous_w/2-m-0.6,
         box_th/2,
         -box_h/2])
     cube([
@@ -155,7 +203,7 @@ translate([
             lens_rm+0.1,
             box_h]);
 translate([
-        cam_hous_w/2+0.4,
+        cam_hous_w/2+0.6,
         box_th/2,
         -box_h/2])
     cube([
@@ -165,7 +213,7 @@ translate([
 
 // push back bars for the front side edge of the pi box
 translate([
-        -cam_hous_w/2-m-0.4,
+        -cam_hous_w/2-m-0.6,
         box_th/2-2,
         -box_h/2])
     hull() {
@@ -180,7 +228,7 @@ translate([
                 2]);
     }
 translate([
-        cam_hous_w/2+0.4,
+        cam_hous_w/2+0.6,
         box_th/2-2,
         -box_h/2])
     hull() {
@@ -200,7 +248,7 @@ if (debug) {
     translate([
             box_w/2,
             -box_th/2-m+3.6+1.6,
-            -box_h/2-m+14])
+            -box_h/2-m+14.4])
         color("white") { 
             cube([21+m,6.5,11]);
             translate([0,3.25,5.5])
@@ -210,14 +258,21 @@ if (debug) {
 }
     
 // beugeltje
-translate([box_w/2-box_r,box_th/2+lens_rm,-box_h/2-m]) {
-    cube([50+box_r,m,14+11+10]);
+translate([box_w/2,box_th/2+lens_rm,-box_h/2-m]) {
+    translate([m-box_r-0.1,0,0])
+        cube([50+box_r+0.1,m,14+11+10]);
+    translate([0,m-box_r-0.1,0])
+        cube([m,box_r+0.1,14+11+10]);
     translate([0,-box_th]) {
         hull() {
-            cube([10+box_r,box_th,m]);
+            cube([10+m,box_th,m]);
             translate([40+box_r,box_th-2,0])
                 cube([m,m+2,m]);
         }
+        cube([m,box_th,max(m,box_r)+0.1]);
+        translate([m-box_r-0.1,0,0])
+            cube([box_r+0.1,box_th,m]);
+            
     }
 }
     
