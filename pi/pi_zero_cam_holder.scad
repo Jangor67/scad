@@ -41,6 +41,29 @@ cord=0;
 //create room for the camera lens to fit inside of the box
 lens_rm=4.8; half_rm=lens_rm/2;
 
+module angle(d = 21) {
+    e=30;
+    o=(box_h+e) * tan(d);
+    a=[0,box_h/2];
+    b=[0,-box_h/2-e];
+    c=[o,-box_h/2-e];
+    
+    polygon([a,b,c]);
+}
+
+//!rotate([-21,0,33])
+!difference() {
+    translate([-box_w/2,box_th/2+lens_rm,0])
+        rotate([90,0,90]) linear_extrude(box_w) angle();
+    // normal h=66 graden, wide h=102 graden
+    // uitgaande van 33 graden en hoogte 30 +40
+    h=60;
+    o=h*tan(33);
+    translate([0,box_th/2+lens_rm-0.01,0]) 
+        rotate([-90,0,0]) 
+        cylinder(h=h,r1=6.5,r2=6.5+2*o);
+}
+
 module cord_holder() {
     cord_d=3.5;
     translate([
