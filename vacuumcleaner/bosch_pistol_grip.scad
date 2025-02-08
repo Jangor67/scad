@@ -2,7 +2,27 @@
 
 out_d  = 50.5+0.3; out_r = out_d/2; // should fit around grip
 sml_d  = 3.2;                       // size of the holes
-sml_l  = 5;                         // distance between holes
+sml_l  = 10.2-3.2;                    // distance between holes
+
+// Nice model but at 17-12-2024 measured the existing pistol grip
+// and compared the compatibility with the new one. It seems that
+// it will just not fit.
+// Existing grip measurements
+// holes are not equally divided over the circle
+//   short distance=22.5 //(nok in the middle)
+// distance from edge towards the center=6.4 
+//   4.8+1.6=6.4 
+//   nokjes zelf 5.3 (5.3+1.6=6.9! flink speling aanhouden!!!)
+// sml_d=3.9 (slightly bigger then on the new pistol grip)
+// 
+// nylon bus (which inserts and helps locking the hose)
+//   d=26.5
+//   h=44
+// hose 
+//   spoed=5.1
+//   bud=40.9
+//   bid=35.1
+
 
 // Some material definitions
 // defaults in prusa slicer 0.15 height (0.2 first layer)
