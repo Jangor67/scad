@@ -1,6 +1,10 @@
 // Pi 4 Holder
 // "Aluminium Housing"
 
+// This version can and should be made a bit more sturdy.
+// One of the frame parts broke when i was clearing the supports 
+// from the printed model...
+
 include <MCAD/boxes.scad>
 
 // box below refers to the housing 
