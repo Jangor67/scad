@@ -2,6 +2,11 @@
 
 // point 0,0,0 is at the center of the magnetic part
 
+// Some material definitions
+// defaults in prusa slicer 0.15 height (0.2 first layer)
+layer_1=0.2;
+layer_n=0.15;
+
 // overall (max measurements)
 disp_w=46.4; // rough measurement
 disp_l=67.8; // also rough measurement
@@ -29,20 +34,58 @@ height_b=height_a+2;
 height_c=height_a+10.85;
 height_d=height_a+12.8;
 
-
-
 module magnet_part(
         d1=magnet_part_d1+0.2,
         d2=magnet_part_d2,
-        h=magnet_part_h-0.1        
+        h=magnet_part_h,
+        fix=0.1        
     ) {
     hull() {
-        translate([-d2/2,0,0])
-            cylinder(h=h,d=d1);
-        translate([d2/2,0,0])
-            cylinder(h=h,d=d1);
+        // make heigt a bit smaller to really have
+        // the magnets stick (no air in between)
+        translate([-d2/2,0,fix+0.001])
+            cylinder(h=h-fix,d=d1);
+        translate([d2/2,0,fix+0.001])
+            cylinder(h=h-fix,d=d1);
     }
 }
+
+module magnets(
+        d1=magnet_part_d1+0.2,
+        d2=magnet_part_d2,
+        h=magnet_part_h,
+        fix=0.1,
+        magnet_w=5,
+        magnet_h=1+0.6 // plus double sided tape thickness
+    ) {
+    translate([0,-magnet_w/2,-magnet_h+fix+0.002-layer_n*1]) {
+        translate([(-d2-magnet_w)/2,0,0])
+            cube([magnet_w,magnet_w,magnet_h]);
+        translate([( d2-magnet_w)/2,0,0])
+            cube([magnet_w,magnet_w,magnet_h]);
+    }
+}
+
+// model countersunk screw for 3d printing
+// useful for creating attachement bores
+// which fit these screws
+// default values are for 3mm x 20mm screw with 6mm head (3.2mm bore for tolerance)
+module screw_countersunk(
+        z  = height_a, //displacement z
+        l  = 22,     //length
+        dh =  7.3,   //head dia
+        db =  3.3,   //base dia (smaller icw ds)
+        lh =  2.2,   //head length
+        ds =  3.9,   //shaft dia
+        )
+{
+    translate([0,0,z-lh+0.01])
+        cylinder(h=lh, r1=db/2, r2=dh/2, $fn=20);
+    translate([0,0,z-lh+0.02-l])
+        cylinder(h=l, d=ds, $fn=20);
+}
+*translate([-disp_w/4,-10,0.1]) screw_countersunk();
+
 
 module back_plate(
     ) {
@@ -89,25 +132,12 @@ module back_plate(
 
     // b is just a nodge above base plane
     zb=height_b;
-    zab=za+(zb-za)*0.3; //
-    bf=(zb-za)/(zc-za);
-    xb1=xa1;              yb1=ya1;
-    xb2=xa2;              yb2=ya2;
-    xb3=xa3+bf*(xc3-xa3); yb3=ya3+bf*(yc3-ya3);
-    xb4=xa4+bf*(xc4-xa4); yb4=ya4+bf*(yc4-ya4);
-    xb5=xa5+bf*(xc5-xa5); yb5=ya5+bf*(yc5-ya5);
-    xb6=xa6+bf*(xc6-xa6); yb6=ya6+bf*(yc6-ya6);
+    zab=za+(zb-za)*0.3; 
+    xb1=xa1; yb1=ya1;
+    xb2=xa2; yb2=ya2;
     points_b = [
         [-xb1,yb1,zab], 
         [-xb2,yb2,zb],
-        [-xb3,yb3,zb],
-        [-xb4,yb4,zb],
-        [-xb5,yb5,zb],
-        [-xb6,yb6,zb],
-        [ xb6,yb6,zb],
-        [ xb5,yb5,zb],
-        [ xb4,yb4,zb],
-        [ xb3,yb3,zb],
         [ xb2,yb2,zb],
         [ xb1,yb1,zab]
     ];
@@ -116,21 +146,18 @@ module back_plate(
     // when looking on the display with screen face down
     // faces go counter clockwise
     faces= [
-      [24,25,26,27,28,29,30,31],   // c or top 24-31
-      
-      // connect b with c
-      [24,25,15,14],[25,26,16,15],[26,27,17,16], //right
-      [27,28,18,17], // top
-      [28,29,19,18],[29,30,20,19],[30,31,21,20], // left
-      [24,14,13,22,21,31],
-
-      // connect a with b
-      [12,13,1,0],[13,14,2,1,],[14,15,3,2],[15,16,4,3],[16,17,5,4], // right
-      [17,18,6,5], // top
-      [18,19,7,6],[19,20,8,7],[20,21,9,8],[21,22,10,9],[22,23,11,10], // left
-      [23,12,0,11], [22,23,12,13], // bottom
-      
-      [0,1,2,3,4,5,6,7,8,9,10,11], // a or bottom 0-11      
+      // a or bot 0-11
+      [ for (i = [11:-1:0]) i ],
+      // nodge
+      [0,1,13,12],[10,11,15,14],[0,12,15,11],[12,13,14,15],
+      // bottom
+      [1,2,16,23,9,10,14,13],
+      // right side
+      [2,3,17,16],[3,4,18,17],[4,5,19,18],
+      [5,6,20,19], //top
+      [6,7,21,20],[7,8,22,21],[8,9,23,22],
+      // c or top 16-23
+      [ for (i = [16:23]) i ],
     ];
     
     difference() {
@@ -138,7 +165,7 @@ module back_plate(
             polyhedron(
                 points=concat(points_a,points_b, points_c),
                 faces=faces,
-                convexity=10);
+                convexity=1000);
     }
 }
 
@@ -152,4 +179,8 @@ difference() {
     translate([-disp_w/2,-base_d_disp,-m])
         cube([disp_w,disp_l-13.5,m+height_c-1]);
     kiox();
+    magnets();
+    translate([-disp_w/4,-10,0.01]) screw_countersunk();
+    translate([ disp_w/4,-10,0.01]) screw_countersunk();
+    translate([        0,-35,0.01]) screw_countersunk();
 }
