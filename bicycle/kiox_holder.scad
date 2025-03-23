@@ -22,20 +22,14 @@ magnet_part_h=1.7;
 top_disp=24.4-magnet_part_d1/2; // from the top
 
 // nodge to align the display at the bottom
-nodge_th=2.3;
-nodge_w=20.6;
-base_a_disp=39.25+magnet_part_d1/2;
-base_ab_disp=-3;
-base_ac_disp=3.65-3.25;
-base_ad_disp=3.65;
-base_d_disp=base_a_disp+base_ad_disp;
+base_a_disp=39.25+1.5+magnet_part_d1/2;
 height_a=magnet_part_h;
 height_b=height_a+2;
 height_c=height_a+10.85;
 height_d=height_a+12.8;
 
 module magnet_part(
-        d1=magnet_part_d1+0.2,
+        d1=magnet_part_d1+0.3,
         d2=magnet_part_d2,
         h=magnet_part_h,
         fix=0.1        
@@ -92,12 +86,12 @@ module back_plate(
     
     // a is base plane
     za=height_a;
-    xa1=19.5/2; ya1=00.0;
+    xa1=19.5/2; ya1=-0.3;
     xa2=22.0/2; ya2=03.4; 
     xa3=25.0/2; ya3=ya2;
     xa4=31.4/2; ya4=24.2;
     xa5=35.8/2; ya5=ya4;
-    xa6=32.8/2; ya6=53.0;
+    xa6=32.8/2; ya6=ya4+27;
     points_a = [
         [-xa1,ya1,za],
         [-xa2,ya2,za],
@@ -115,10 +109,10 @@ module back_plate(
     
     // c is just below display
     zc=height_c;
-    xc3=35.0/2;   yc3=base_ab_disp;
-    xc4=40.2/2;   yc4=base_ab_disp+16.65;
+    xc3=35.0/2;   yc3=-0.8;
+    xc4=40.2/2;   yc4=-3+16.65+1;
     xc5=xc4+2.45; yc5=yc4;
-    xc6=41.5/2;   yc6=base_ab_disp+62.9;
+    xc6=41.5/2;   yc6=ya6+8.4;
     points_c = [
         [-xc3,yc3,zc],
         [-xc4,yc4,zc],
@@ -174,13 +168,30 @@ module kiox() {
     back_plate();
 }
 
+// layer 1 is thicker than the next layers
+l1=0.2;
+ln=0.15;
+
 m=2.1; //material thickness
+
+$fn=50;
+
 difference() {
-    translate([-disp_w/2,-base_d_disp,-m])
-        cube([disp_w,disp_l-13.5,m+height_c-1]);
+    translate([-disp_w/2,-base_a_disp-3.65,-m]) {
+        *cube([disp_w,disp_l-13.5,m+height_c-1]);
+        
+        // t1
+        translate([20,0,0])
+        cube([5,disp_l,m+height_c-0.001]);
+        
+        //t2
+        *translate([0,0,m+magnet_part_h])
+        *cube([disp_w,disp_l-7,l1+ln]);
+        
+    }
     kiox();
-    magnets();
-    translate([-disp_w/4,-10,0.01]) screw_countersunk();
-    translate([ disp_w/4,-10,0.01]) screw_countersunk();
-    translate([        0,-35,0.01]) screw_countersunk();
+    *magnets();
+    *translate([-disp_w/4,-10,0.01]) screw_countersunk();
+    *translate([ disp_w/4,-10,0.01]) screw_countersunk();
+    *translate([        0,-35,0.01]) screw_countersunk();
 }
