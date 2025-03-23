@@ -84,29 +84,18 @@ module screw_countersunk(
 
 
 module back_side(
-        za=height_a,
-        zb=height_b,
-        zc=height_c
     ) {
     
     // a is base plane
-    yb_corr=0.5;
-    xa1=19.5/2; ya1=-0.3+yb_corr;
-    xa2=22.0/2; ya2=03.4-0.3; 
+    za=height_a;
+    // new
+    //yb_corr=0.5;    
+    xa1=19.5/2; ya1=-0.3;
+    xa2=22.0/2; ya2=03.4-0.3;     
     xa3=25.0/2; ya3=ya2;
     xa4=31.4/2; ya4=24.2;
     xa5=36.0/2; ya5=ya4;
     xa6=33.0/2; ya6=ya4+27+2.5;
-    // b is just a nodge above base plane
-    zab=za+0.6+1.4/(ya2-ya1)*yb_corr; // za+2*0.3 = za+0.6
-    xb1=xa1; yb1=ya1;
-    xb2=xa2; yb2=ya2+0.5;
-    // c is just below display
-    xc3=35.0/2;   yc3=-0.8-0.3+0.8;
-    xc4=40.2/2;   yc4=-3+16.65+1;
-    xc5=xc4+2.45; yc5=yc4;
-    xc6=41.5/2;   yc6=ya6+7+2.5;
-
     points_a = [
         [-xa1,ya1,za],
         [-xa2,ya2,za],
@@ -120,13 +109,29 @@ module back_side(
         [ xa3,ya3,za],
         [ xa2,ya2,za],
         [ xa1,ya1,za]
-    ];    
+    ];
+
+    // b is just a nodge above base plane
+    zb=height_b;
+    zab=za+0.6;
+    // ehm... wip
+    // yb_corr=0.0;
+    // zab=za+0.6+1.4/(ya2-ya1)*yb_corr; // za+2*0.3 = za+0.6
+    xb1=xa1; yb1=ya1;
+    xb2=xa2; yb2=ya2+0.5;
     points_b = [
         [-xb1,yb1,zab], 
         [-xb2,yb2,zb],
         [ xb2,yb2,zb],
         [ xb1,yb1,zab]
     ];
+    
+    // c is just below display
+    zc=height_c;
+    xc3=35.0/2;   yc3=-0.8-0.3+0.8;
+    xc4=40.2/2;   yc4=-3+16.65+1;
+    xc5=xc4+2.45; yc5=yc4;
+    xc6=41.5/2;   yc6=ya6+7+2.5;
     points_c = [
         [-xc3,yc3,zc],
         [-xc4,yc4,zc],
@@ -137,7 +142,7 @@ module back_side(
         [ xc4,yc4,zc],
         [ xc3,yc3,zc]
     ];
-    
+
     // when looking on the display with screen face down
     // faces go counter clockwise
     faces= [
@@ -155,13 +160,11 @@ module back_side(
       [ for (i = [16:23]) i ],
     ];
     
-    difference() {
-        translate([0,-base_a_disp,0])
-            polyhedron(
-                points=concat(points_a,points_b, points_c),
-                faces=faces,
-                convexity=1000);
-    }
+    translate([0,-base_a_disp,0])
+        polyhedron(
+            points=concat(points_a,points_b, points_c),
+            faces=faces,
+            convexity=1000);
 }
 
 module kiox() {
@@ -181,10 +184,10 @@ $fn=50;
 
 difference() {
     translate([-disp_w/2,-base_a_disp-3.65,-m]) {
-        cube([disp_w,disp_l-13.5,m+height_c-1]);
+        *cube([disp_w,disp_l-13.5,m+height_c-1]);
         
         // t1
-        *translate([20,0,0])
+        translate([20,0,0])
           cube([5,disp_l,m+height_c-1.001]);
         
         //t2
@@ -192,7 +195,7 @@ difference() {
            cube([disp_w,disp_l-7,l1+ln]);
         
     }
-    #kiox();
+    kiox();
     
     // breach bottom of the bracket
     points_r=[ 
