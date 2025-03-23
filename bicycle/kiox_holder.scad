@@ -1,6 +1,7 @@
 // Bosch Kiox display holder
 
 // point 0,0,0 is at the center of the magnetic part
+// note that an y_corr is introduced to fix some errors...
 
 // Some material definitions
 // defaults in prusa slicer 0.15 height (0.2 first layer)
@@ -26,26 +27,27 @@ base_a_disp=39.25+1.5+magnet_part_d1/2;
 height_a=magnet_part_h;
 height_b=height_a+2;
 height_c=height_a+10.85;
-height_d=height_a+12.8;
+// height_d=height_a+12.8;
 
 module magnet_part(
-        d1=magnet_part_d1+0.3,
+        d1=magnet_part_d1+0.5,
         d2=magnet_part_d2,
         h=magnet_part_h,
-        fix=0.1        
+        fix=0.1
     ) {
+    y_corr=-0.3;
     hull() {
         // make heigt a bit smaller to really have
         // the magnets stick (no air in between)
-        translate([-d2/2,0,fix+0.001])
+        translate([-d2/2,y_corr,fix+0.001])
             cylinder(h=h-fix,d=d1);
-        translate([d2/2,0,fix+0.001])
+        translate([d2/2,y_corr,fix+0.001])
             cylinder(h=h-fix,d=d1);
     }
 }
 
-module magnets(
-        d1=magnet_part_d1+0.2,
+module dropin_magnets(
+        d1=magnet_part_d1,
         d2=magnet_part_d2,
         h=magnet_part_h,
         fix=0.1,
@@ -81,17 +83,30 @@ module screw_countersunk(
 *translate([-disp_w/4,-10,0.1]) screw_countersunk();
 
 
-module back_plate(
+module back_side(
+        za=height_a,
+        zb=height_b,
+        zc=height_c
     ) {
     
     // a is base plane
-    za=height_a;
-    xa1=19.5/2; ya1=-0.3;
-    xa2=22.0/2; ya2=03.4; 
+    yb_corr=0.5;
+    xa1=19.5/2; ya1=-0.3+yb_corr;
+    xa2=22.0/2; ya2=03.4-0.3; 
     xa3=25.0/2; ya3=ya2;
     xa4=31.4/2; ya4=24.2;
-    xa5=35.8/2; ya5=ya4;
-    xa6=32.8/2; ya6=ya4+27;
+    xa5=36.0/2; ya5=ya4;
+    xa6=33.0/2; ya6=ya4+27+2.5;
+    // b is just a nodge above base plane
+    zab=za+0.6+1.4/(ya2-ya1)*yb_corr; // za+2*0.3 = za+0.6
+    xb1=xa1; yb1=ya1;
+    xb2=xa2; yb2=ya2+0.5;
+    // c is just below display
+    xc3=35.0/2;   yc3=-0.8-0.3+0.8;
+    xc4=40.2/2;   yc4=-3+16.65+1;
+    xc5=xc4+2.45; yc5=yc4;
+    xc6=41.5/2;   yc6=ya6+7+2.5;
+
     points_a = [
         [-xa1,ya1,za],
         [-xa2,ya2,za],
@@ -105,14 +120,13 @@ module back_plate(
         [ xa3,ya3,za],
         [ xa2,ya2,za],
         [ xa1,ya1,za]
+    ];    
+    points_b = [
+        [-xb1,yb1,zab], 
+        [-xb2,yb2,zb],
+        [ xb2,yb2,zb],
+        [ xb1,yb1,zab]
     ];
-    
-    // c is just below display
-    zc=height_c;
-    xc3=35.0/2;   yc3=-0.8;
-    xc4=40.2/2;   yc4=-3+16.65+1;
-    xc5=xc4+2.45; yc5=yc4;
-    xc6=41.5/2;   yc6=ya6+8.4;
     points_c = [
         [-xc3,yc3,zc],
         [-xc4,yc4,zc],
@@ -123,24 +137,11 @@ module back_plate(
         [ xc4,yc4,zc],
         [ xc3,yc3,zc]
     ];
-
-    // b is just a nodge above base plane
-    zb=height_b;
-    zab=za+(zb-za)*0.3; 
-    xb1=xa1; yb1=ya1;
-    xb2=xa2; yb2=ya2;
-    points_b = [
-        [-xb1,yb1,zab], 
-        [-xb2,yb2,zb],
-        [ xb2,yb2,zb],
-        [ xb1,yb1,zab]
-    ];
     
-    // each layer has 12 points
     // when looking on the display with screen face down
     // faces go counter clockwise
     faces= [
-      // a or bot 0-11
+      // layer a or bottom 0-11
       [ for (i = [11:-1:0]) i ],
       // nodge
       [0,1,13,12],[10,11,15,14],[0,12,15,11],[12,13,14,15],
@@ -164,8 +165,10 @@ module back_plate(
 }
 
 module kiox() {
-    magnet_part();
-    back_plate();
+    union() {
+        magnet_part();
+        back_side();
+    }
 }
 
 // layer 1 is thicker than the next layers
@@ -178,19 +181,35 @@ $fn=50;
 
 difference() {
     translate([-disp_w/2,-base_a_disp-3.65,-m]) {
-        *cube([disp_w,disp_l-13.5,m+height_c-1]);
+        cube([disp_w,disp_l-13.5,m+height_c-1]);
         
         // t1
-        translate([20,0,0])
-        cube([5,disp_l,m+height_c-0.001]);
+        *translate([20,0,0])
+          cube([5,disp_l,m+height_c-1.001]);
         
         //t2
         *translate([0,0,m+magnet_part_h])
-        *cube([disp_w,disp_l-7,l1+ln]);
+           cube([disp_w,disp_l-7,l1+ln]);
         
     }
-    kiox();
-    *magnets();
+    #kiox();
+    
+    // breach bottom of the bracket
+    points_r=[ 
+        [-12/2,height_a],
+        [-22/2,height_c],
+        [+22/2,height_c],
+        [+12/2,height_a]
+    ];
+    *rotate([90,0,0])
+        translate([0,0,base_a_disp-10])
+        linear_extrude(height=20)
+        polygon(points=points_r);
+
+    // dropin magnets
+    *dropin_magnets();
+    
+    // screws for mounting on the wall
     *translate([-disp_w/4,-10,0.01]) screw_countersunk();
     *translate([ disp_w/4,-10,0.01]) screw_countersunk();
     *translate([        0,-35,0.01]) screw_countersunk();
