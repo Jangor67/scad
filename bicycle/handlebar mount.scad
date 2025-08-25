@@ -1,5 +1,12 @@
+// Copied from 
+// https://github.com/chadkirby/quarter-turn-mount
+// Adjustments
+// - make ring more tight
+// - make nodges in the base plate a bit bigger/wider
+
 use <outer.scad>
-handleBarD = 32.2;
+
+handleBarD = 32.2; // checked and OK for Braun
 thick = 2.5;
 width = 12;
 direction = -1; // -1 puts the computer to the left of the mount arm; 1 would put the computer to the right, if it weren't broken
@@ -93,6 +100,8 @@ module screws() {
     moveToIntermediate() rotate([-30, 0, 0]) rotate([0, 0, 180/6]) translate([0, 0, 1]) m4ButtonScrew(4.5);
     translate([0, 0, 0]) moveToFar() rotate([30, 0, 0]) rotate([0, 0, 180/6]) translate([0, 0, 1]) m4ButtonScrew(4.5);
 }
+
+// handlebar ring
 module ring() {
     hull() {
         cylinder(r = handleBarD/2 + thick, h=width, center=true, $fn=60);
@@ -165,6 +174,7 @@ module holderAssembly() {
             moveAndRotateToOuter() bodyCutouts();
             translate([direction * 1.5, 0, 0])screws();
         }
+        // two nodges (these help to lock computer)
         moveAndRotateToOuter() bodyAdditions();
     }
 }
@@ -234,11 +244,18 @@ module topMount() {
 
     mountArm();
 }
-rotate([0, 0, 0]) {
+
+// create bike arm
+*rotate([0, 0, 0]) {
     botMount();
     topMount();
+    // debug
     *holderAssembly();
 }
+
+// quarter-turn-mount holder (ring)
 translate([0, direction * 25, armThickness/2 + 2.5]) rotate([0, direction * -90, 90])
     holderAssembly();
+    
+// quarter-turn-mount insert
 translate([-42, 45, -4]) rotate([180, 0, 0]) insert();

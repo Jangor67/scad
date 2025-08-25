@@ -1,6 +1,9 @@
 $fs = 1;
 $fa = 6;
 
+qmod1=28.8+0.2; // quarter mount outer diameter (was 30)
+qmod2=24.9+0.2; // quarter mount inner diameter (was 26)
+
 module index(inflate = 0) {
     xoffset = 20;
     difference() {
@@ -18,15 +21,21 @@ module shell(inflate=0, height = 10) {
 }
 module bodyCutouts() {
     // form the lip that holds the cleat tabs
-    translate([0,0,1.25]) cylinder(d=30, h=100, center=false, $fn=60);
+    translate([0,0,1.25]) cylinder(d=qmod1, h=100, center=false, $fn=60);
     // make the through-hole for the cleat body
-    cylinder(d=26, h=100, center=true, $fn=60);
+    cylinder(d=qmod2, h=100, center=true, $fn=60);
     // make the cutout to insert the cleat tabs
     cleatTabs(5, 1.5, 5.1, cutout = 1);
 }
 module bodyAdditions() {
-    translate([0, 31.25/2, 0]) cylinder(d=3, h=5, center=false);
-    translate([0, -31.25/2, 0]) cylinder(d=3, h=5, center=false);
+    // 24-8-2025 it looks like that
+    // the additions each make a "dent" of 0.7mm  
+    // 31-28.7=2.3mm
+    bad=3; // body addition diameter
+    bay=(qmod1+bad)/2-0.7; // instead of 31.25/2
+    
+    translate([0, bay, 0]) cylinder(d=bad, h=5, center=false, $fn=30);
+    #translate([0, -bay, 0]) cylinder(d=bad, h=5, center=false, $fn=30);
 }
 module holderBody() {
     difference() {
@@ -63,14 +72,29 @@ module cleat() {
 }
 
 module insertIndent(depth = 1, inflateX= 0, inflateY = 0) {
-    yy = 2.45/2;
+    // indent is 2.7 wide at d=23.6
+    inw1=2.7;
+    icd1=23.6-0.2;
+    // indent is 1.3 wide at d=15
+    inw2=1.3;
+    icd2=15.0+0.2;
+    // construct
     rotate([0, 0, 90]) hull() {
-        translate([11.95 + inflateX, 0, 0]) {
-            cube([0.1, 1, depth * 2], center=true);
-            translate([0, yy, 0]) cube([0.1, 0.1, 0.1], center=true);
-            translate([0, -yy, 0]) cube([0.1, 0.1, 0.1], center=true);
+        // start from the outside
+        translate([icd1/2 + inflateX - 0.1, 0, 0]) {
+            cube([0.1, inw1-0.4, (depth-0.0)*2], center=true);
+            cube([0.1, inw1,     (depth-0.2) * 2], center=true);
         }
-        translate([0, 0, -(depth + 0.5)]) cube([1, 0.1, 0.1], center=true);
+        // inside
+        translate([icd2/2 + inflateX, 0, 0]) {
+            cube([0.1, inw2-0.4, (depth-0.2)*2], center=true);
+            cube([0.1, inw2,     (depth-0.4) * 2], center=true);
+        }  
+        // and round it off      
+        translate([icd2/2-0.2, 0, 0]) { 
+            cube([0.1, inw2-0.6, (depth-0.4) * 2], center=true);
+            cube([0.1, inw2-0.2, (depth-0.6) * 2], center=true);
+        }
     }
 }
 
@@ -79,9 +103,9 @@ module insert() {
     difference() {
         union() {
             cleatSmallCyl(height = 2, inflate = -0.5);
-            cleatTabs(4, 0.5, height = 2);
-            rotate([0, 180, 0]) insertIndent(1.25, -0.75, -0.5);
-            rotate([0, 180, 180]) insertIndent(1.25, -0.75, -0.5);
+            cleatTabs(4, 1.2, height = 2);
+            rotate([0, 180, 0]) insertIndent(1, 0, -0.5);
+            rotate([0, 180, 180]) insertIndent(1, 0, -0.5);
         }
         // make bendy wing things
         difference() {
