@@ -3,6 +3,15 @@
 // Adjustments
 // - make ring more tight
 // - make nodges in the base plate a bit bigger/wider
+// Further adjustments
+// - move/bend arm approx 13.5mm to the left
+// - move arm 7mm outward (update computerDims)
+
+// control what to create and print
+createArm=1;
+createRing=0;
+createInsert=0;
+showComputer=0; // make it visible for debugging
 
 use <outer.scad>
 
@@ -11,8 +20,11 @@ thick = 2.5;
 width = 12;
 direction = -1; // -1 puts the computer to the left of the mount arm; 1 would put the computer to the right, if it weren't broken
 armThickness = 12;
-desiredGapBetwComputerAndHandlebar = 8;
-computerDims = [12, 62, 42];
+desiredGapBetwComputerAndHandlebar = 4;
+
+//update for Garmin Edge 830 (85.5-62=23.5/2=11.75)
+oldComputerDims = [12,62+2,42];
+computerDims = [17.5, 85.5, 51.5]; 
 offsetFromHandlebar = computerDims[1]/2 + desiredGapBetwComputerAndHandlebar;
 mountY = offsetFromHandlebar + handleBarD/2;
 shellD = 36;
@@ -73,7 +85,14 @@ module handlebar() {
     cylinder(d=handleBarD, h=big, center=true, $fn=60);
 }
 module computer() {
-    translate([direction * (-computerDims[0]/2), 0, 0]) moveToOuter() cube(computerDims, center=true);
+    translate([direction * (-computerDims[0]/2), 0, 0]) moveToOuter() {
+        cube(computerDims, center=true);
+        rotate([0,-90,0]) {
+            translate([0,0,(2+computerDims[0])/2]) cylinder(h=2,d=24.9, center=true);
+            translate([0,0,(4+computerDims[0])/2]) cylinder(h=2,d=28.8, center=true);
+        }
+        translate([-computerDims[0],0,0]) cube(oldComputerDims, center=true);
+    }
 }
 module translateScrew(direction = 1) {
     translate([0,direction*(width/2 + handleBarD/2), 0]) children();
@@ -239,23 +258,31 @@ module topMount() {
                 center=true
             );
         }
-        computer(); // just for visualization
+        if (showComputer) {
+            #computer(); // just for visualization
+        }
     }
 
     mountArm();
 }
 
 // create bike arm
-*rotate([0, 0, 0]) {
-    botMount();
-    topMount();
-    // debug
-    *holderAssembly();
+if (createArm) {
+    rotate([0, 0, 0]) {
+        botMount();
+        topMount();
+        // debug
+        *holderAssembly();
+    }
 }
 
 // quarter-turn-mount holder (ring)
-translate([0, direction * 25, armThickness/2 + 2.5]) rotate([0, direction * -90, 90])
-    holderAssembly();
+if (createRing) {
+    translate([0, direction * 25, armThickness/2 + 2.5]) rotate([0, direction * -90, 90])
+        holderAssembly();
+}
     
 // quarter-turn-mount insert
-translate([-42, 45, -4]) rotate([180, 0, 0]) insert();
+if (createInsert) {
+    translate([-42, 45, -4]) rotate([180, 0, 0]) insert();
+}
