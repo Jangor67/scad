@@ -1,5 +1,6 @@
 // V70 30756127 trekhaakafdekkap (Tow Bar Cover) 
 // version 2 extra reinforcement and some fixes
+// version 3 fine tuning (spring should be bigger)
 
 m=1.5;
 // base size and length
@@ -61,6 +62,7 @@ ch=17;
 
 // spring on the right side
 mx=2;
+px=10;
 p20=[
   // spring between 15 and 74 mm and
   // spacing of 8
@@ -68,23 +70,23 @@ p20=[
   [ m, 48.5],
   [ m, 74-m],
   // first bend
-  [ 8-m, 74-m],
-  [ 8-m, 48.5],
-  [ 8,   40.0],
-  [ 8, 13],
-  [16, 13],
-  [19, 12],
+  [px-m, 74-m],
+  [px-m, 48.5],
+  [px,   40.0],
+  [px, 13],
+  [px+8, 13],
+  [px+11, 12],
   // second bend (handle)
-  [19+mx, 12+mx],
-  [16+mx, 13+mx],
-  [ 8+mx, 13+mx],
+  [px+11+mx, 12+mx],
+  [px+8+mx, 13+mx],
+  [px+mx, 13+mx],
   // notch (keeping it in its place)
-  [ 8+mx,     48.5],
-  [ 8+mx+4.3, 48.5],
-  [ 8+mx+4.3, 48.5+mx],
-  [ 8+mx,     48.5+mx+4.3],
+  [px+mx,     44.5],
+  [px+mx+4.3, 44.5],
+  [px+mx+4.3, 44.5+mx],
+  [px+mx,     44.5+mx+4.3],
   // and go further up
-  [ 8+mx, 74+mx],
+  [px+mx, 74+mx],
   [ 0-m,  74+mx],
   [ 0-m,  48.5 ],
   [ 0-m,  40.0 ],  
@@ -93,18 +95,18 @@ p20=[
 p21=[
   [ m,     64-m-m],
   [ m+m,   74-m-m],
-  [ 8-m-m, 74-m-m],
-  [ 8-m-m, 48.5],
-  [ 8-m,   38.5],
-  [ 8-m,   23  ],
-  [ 8,     13  ],
-  [16,     12  ],
-  [19,     12  ],
-  [16,     13+m],
-  [ 8+m+m, 13+m],
-  [ 8+m,   23  ],
-  [ 8+m,   48.5],
-  [ 8+m,   74-m],
+  [px-m-m, 74-m-m],
+  [px-m-m, 48.5],
+  [px-m,   38.5],
+  [px-m,   23  ],
+  [px,     13  ],
+  [px+8,   12  ],
+  [px+11,  12  ],
+  [px+8,   13+m],
+  [px+m+m, 13+m],
+  [px+m,   23  ],
+  [px+m,   48.5],
+  [px+m,   74-m],
   [ 0,     74-m],
   [ 0,     64-m]
 ];
