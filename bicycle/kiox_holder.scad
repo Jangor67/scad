@@ -29,6 +29,12 @@ height_b=height_a+2;
 height_c=height_a+10.85;
 // height_d=height_a+12.8;
 
+// We are going to use this library  for help with debugging
+// https://github.com/revarbat/BOSL
+// set OPENSCADPATH=$HOME/documents/BOSL
+include <constants.scad>
+use <debug.scad>
+
 module magnet_part(
         d1=magnet_part_d1+0.5,
         d2=magnet_part_d2,
@@ -151,7 +157,9 @@ module back_side(
       // nodge
       [0,1,13,12],[10,11,15,14],[0,12,15,11],[12,13,14,15],
       // bottom
-      [1,2,16,23,9,10,14,13],
+      // [1,2,16,23,9,10,14,13],
+      // bottom alternative
+      [1,2,13],[2,16,13],[13,16,23,14],[9,14,23],[9,10,14],
       // right side
       [2,3,17,16],[3,4,18,17],[4,5,19,18],
       [5,6,20,19], //top
@@ -161,7 +169,7 @@ module back_side(
     ];
     
     translate([0,-base_a_disp,0])
-        polyhedron(
+        debug_polyhedron(
             points=concat(points_a,points_b, points_c),
             faces=faces,
             convexity=1000);
@@ -183,18 +191,14 @@ m=2.1; //material thickness
 $fn=50;
 
 difference() {
-    translate([-disp_w/2,-base_a_disp-3.65,-m]) {
-        *cube([disp_w,disp_l-13.5,m+height_c-1]);
+    translate([-disp_w/2,-base_a_disp-3.65,-m])
+        cube([disp_w,disp_l-13.5+13.5,m+height_c-1]);
         
-        // t1
-        translate([20,0,0])
-          cube([5,disp_l,m+height_c-1.001]);
+    translate([-disp_w/2-0.001,-base_a_disp-3.651,-m-0.001])
+        cube([20,disp_l+0.001,m+height_c-0.998]);
+    *translate([0,-base_a_disp-3.651,-m-0.001])
+        cube([25,disp_l+0.001,m+height_c-0.998]);
         
-        //t2
-        *translate([0,0,m+magnet_part_h])
-           cube([disp_w,disp_l-7,l1+ln]);
-        
-    }
     kiox();
     
     // breach bottom of the bracket
