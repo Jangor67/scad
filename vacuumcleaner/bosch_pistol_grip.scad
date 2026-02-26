@@ -1,4 +1,5 @@
 // Model to help drilling and cutting an existing pistol grip
+// NEVER USED (YET)
 
 out_d  = 50.5+0.3; out_r = out_d/2; // should fit around grip
 sml_d  = 3.2;                       // size of the holes
