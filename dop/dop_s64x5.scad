@@ -139,9 +139,11 @@ module cap_body() {
     
     // help to keep an O-ring in place
     translate([0,0,wall_thickness-0.1]) difference() {
-        cylinder(h=3.1, d=thread_ID-2*wall_thickness-0.2, center=false);
+        oring=thread_ID-2*wall_thickness-0.2;
+        echo("O-ring inner D: ", oring); 
+        cylinder(h=3.1, d=oring, center=false);
         translate([0,0,-0.1])
-        cylinder(h=3.3, d=thread_ID-4*wall_thickness+0.2, center=false);
+        cylinder(h=3.3, d=oring-2*wall_thickness+0.4, center=false);
     }
     
     // add 8 notches, giving grip to tighten/loosen
