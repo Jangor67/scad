@@ -1,4 +1,8 @@
 // spitoon
+// v1 is goed gelukt maar draad van de
+//   top moest worden afgevijld tot 39mm
+// v2 nog niet geprint maar aangepast naar
+//   1mm (dus gat - 1) 
 
 // Some material definitions
 // defaults in prusa slicer 0.15 height (0.2 first layer)
@@ -11,14 +15,25 @@ wall=nozzle*2;
 
 // Prusa Mini kan max 180 x 180 x 180 printen
 max=180;
+
+// v1 is NIET waterdicht
+// m=1.5 dus net GEEN 4 perimeter/nozzle
+// - m2 is dus verdubbeld (handig met d=xxx)
+// - slicer laat zien dat shell = 4 perimeters
+//
+// ChatGPT tips:
+// 🧠 Vaak betere oplossing dan coaten
+// Omdat PETG al waterdicht kan zijn:
+//
+// ✅ Print-instellingen aanpassen
+// - Meer walls (≥ 4)
+// - Hogere nozzle temp
+// - Langzamer printen
+// - 100% flow
+// - Dikkere top/bottom layers
+// 👉 Veel PETG-prints worden hiermee zonder coating al waterdicht
 m=1.5;
 m2=m*2;
-
-//https://github.com/JohK/nutsnbolts.git
-include <nutsnbolts/cyl_head_bolt.scad>
-
-//screw("M30x100", thread="modeled"); 
-//nut("M30", thread="modeled");
 
 debug=false;
 peek=false;
@@ -222,7 +237,9 @@ module top (max=max, ho=65) {
       if (peek) cube([90,90,ho+4*pitch]);
     }
     translate([0,0,pitch/2])
-    thread(gat-0.4,5,outer=false,soft_start=false);
+    // v1 = gat - 0.4 -> is niet genoeg!
+    // na afvijlen lijkt 1mm voldoende!
+    thread(gat-1,5,outer=false,soft_start=false);
   }   
     
 }
