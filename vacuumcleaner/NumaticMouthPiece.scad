@@ -12,7 +12,7 @@
 //       - d=3mm
 //       - l=8.2
 //       - afstand 6.5
-// flexibele buis heeft opzetstuk van43.5mm (dat draait in het handvat)
+// flexibele buis heeft opzetstuk van 43.5mm (dat draait in het handvat)
 // metalen buis
 //   - buitendiameter 31.6
 // borstelmondstuk 
@@ -95,7 +95,11 @@ module base(
       massivebase(l=l);
       translate([0,0,-2])
         massivebase(
-          diameter=diameter-d2,
+          // 51.7 - 4*2 = 43.7
+          // print 1 is te klein
+          // - na al even te hebben gevijld is hij nog
+          // - 43.3 tot 43.7
+          diameter=diameter-d2+1,
           diameter2=diameter2-d2,
           l=l);
       cylinder(h=l+0.1,d=diameter2);
