@@ -3,7 +3,7 @@
 // v3 verstevigd en ook geprint
 // v4 big bad bat is the winner and is fine-tuned
 //    me and jeroen have v4 but battery fit was a bit too tight
-// v5 
+// v5 printed for Gerard 23-11-2025
 
 trpndr_d1=37; trpndr_r1=trpndr_d1/2;
 trpndr_dx=2.8;
@@ -122,6 +122,11 @@ module tywraps(w=tywrap_w,h=tywrap_h) {
     }
 }
 
+module little_piece(l=trpndr_bw-trpndr_dx, w=3, h=1.1) {
+  echo("little_piece (l x w x h)", l, " x ", w, " x ", h);
+  cube([w,l,h]);
+}
+
 module basicframe(height=3.5, wiring=false, topmount=false) {
     difference() {
       union() {
@@ -132,10 +137,22 @@ module basicframe(height=3.5, wiring=false, topmount=false) {
         }
         // next we create body (using 2 bars) 
         // this is creating the velcrow windows
-        translate([-trpndr_d1/2+5,trpndr_bw/2-trpndr_dx,0])
-          cube([trpndr_d1-10,trpndr_dx,height]);
-        translate([-trpndr_d1/2+5,-trpndr_bw/2,0])
-          cube([trpndr_d1-10,trpndr_dx,height]);
+        difference() {
+          union () {
+            translate([-trpndr_d1/2+5,trpndr_bw/2-trpndr_dx,0])
+              cube([trpndr_d1-10,trpndr_dx,height]);
+            translate([-trpndr_d1/2+5,-trpndr_bw/2,0])
+              cube([trpndr_d1-10,trpndr_dx,height]);
+          }
+          // v5 cutout some to be able to mount little 
+          // pieces to keep battery and wires down
+          translate([-trpndr_d1/2+11,-trpndr_bw/2+trpndr_dx/2-0.2,1.5]) {
+            for (x=[0:6:trpndr_d1-20]) {
+              translate([x,0,0])
+                little_piece(l=21.9,w=3.1,h=height-1.5+0.01);
+            }
+          }
+        }
         if (topmount) {
           // build walls to mount battery on top 
           // with tywraps
@@ -382,9 +399,16 @@ module AA2() {
 module AA2_box(wire_d=wire_d) {
   spacing=0.8; // spacing on all sides of the battery 
   // afmetingen (DxH): 14,5 x 25 mm, gewicht: 9 gram 
-  // v5 actual height is 25.4!!!
+  // v5 
+  // 1-11-2025: (reconstructed changes)
+  // - actual height aah increased from 25.0 to 25.4
+  // - need to actually measure this!
+  // 23-11-2025: (measurements done)
+  // - measured with black tape on both ends: 25.7
+  // - tape is approx 0.2
+  // - actual height is 25.3 take 0.2 margin
   aad=14.5+spacing; aado=aad+wall4;
-  aah=25.4+spacing; aaho=aah+wall4;
+  aah=25.5+spacing; aaho=aah+wall4;
   extra_spacing=3; // extra spacing for wires/soldering contacts
   translate([0,-aaho/2,0]) {
       difference() {
@@ -446,7 +470,7 @@ module AA2_box(wire_d=wire_d) {
     }
 }
 
-
+// the choice we made!!! 
 // most powerfull battery housing, small base plate
 translate([0,-2*(trpndr_d1+5),0]) {
   basicframe(2.6,true);
@@ -458,6 +482,11 @@ translate([0,-2*(trpndr_d1+5),0]) {
     *cube([100,100,100]);  
   }
   translate([0,0,2.6+2]) %trpndr();
+  translate([trpndr_d1/2+5,trpndr_d1/2+5,0]) 
+    for (x = [0:6:12]) {
+      translate([x,0,0])
+        little_piece();
+    }
 }
 
 // small base plate, 
