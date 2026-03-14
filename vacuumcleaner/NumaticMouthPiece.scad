@@ -126,9 +126,18 @@ module mouthpiece() {
       slantedtube(sleeve=0);
 }
 
-difference() {
-  mouthpiece();
-  cube([50,50,160]); }
+// printer specifics
+layer_1=0.2;
+layer_n=0.15;
+first_3=layer_1+2*layer_n;
+
+mouthpiece();
+
+// test bottom tube size
+//difference() {
+//  mouthpiece();
+//  translate([-30,-30,first_3]) cube([60,60,160]); 
+//}
 
 // check 1 (mounting piece)
 %difference() {
