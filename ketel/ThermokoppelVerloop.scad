@@ -15,11 +15,11 @@ d3=9;
 h3=45.5; 
 
 // locking screw
-lsd=4;
+lsd=5;
 lsh=3.5;
 
 // m6 thermokoppel
-td1=m6d;
+td1=m6d+0.2;
 td2=11.2+0.8; // nut needs 9.9-11.2mm spacing
 th=10;
 tnh=4;
@@ -37,7 +37,7 @@ difference() {
     }
     
     // thermokoppel
-    translate([0,0,-0,01])
+    translate([0,0,-0.01])
         cylinder(h=h22-th+0.01,d=td2);
     cylinder(h=h21+0.02,d=td1);
     translate([0,0,h22-m6h-0.01])
