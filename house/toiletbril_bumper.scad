@@ -1,4 +1,5 @@
 // WC bril rubber mal
+// v1 has too small cover (single wall) but printed and used anyway
 
 ht=13.3;
 
@@ -69,11 +70,12 @@ difference() {
 }
 
 // cover parameters
-lci=l+0.4; lco=lci+wall;
-dci=d+0.4; dco=dci+wall;
+wall2=wall*2;
+lci=l+0.4; lco=lci+wall2;
+dci=d+0.4; dco=dci+wall2;
 hc=h-4*layer_n;
-lto=l2+wall;
-dto=d2+wall;
+lto=l2+wall2;
+dto=d2+wall2;
 htop=h2;
 
 // make some nodges (to help disassemble)
@@ -84,8 +86,8 @@ module cover() {
         difference() {
         union() {
             mount(l=lco,d=dco,h=hc);
-            translate([0,0,hc-0.1])
-                mount(l=lto,d=dto,h=htop+0.1);
+            translate([0,0,hc-4*layer_n])
+                mount(l=lto,d=dto,h=htop);
         }
         translate([0,0,-0.01])
             mount(l=lci,d=dci,h=hc-4*layer_n);
@@ -100,7 +102,7 @@ module cover() {
 %translate([0,0,9*layer_n])
     cover();
     
-translate([0,dco+5,ht+layer_1])
+translate([0,dco+5,hc-4*layer_n+htop])
     rotate([180,0,0])
         cover();
 
